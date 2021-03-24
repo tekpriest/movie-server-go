@@ -1,0 +1,2 @@
+db:
+  uri: "mongodb+srv://x1k:hero@cluster0.gznkd.gcp.mongodb.net/movie_server?retryWrites=true&w=majority"

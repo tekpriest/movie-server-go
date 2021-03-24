@@ -1,0 +1,5 @@
+app:
+  port: 5013
+  log: true
+db:
+  uri: "mongodb://localhost/movie_server"
