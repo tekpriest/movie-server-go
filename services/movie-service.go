@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/en1tan/movie-server/database"
@@ -33,12 +32,13 @@ func (ms *movieService) List(page int) (error, *[]models.Movie) {
 	var movies []models.Movie
 	opts := options.Find()
 	opts.SetSort(bson.D{{"createdAt", -1}})
+	opts.SetLimit(40)
 	cur, err := ms.db.Find(ctx, bson.D{}, opts)
 	if err != nil {
-		panic(err)
+		return err, nil
 	}
 	if err = cur.All(ctx, &movies); err != nil {
-		panic(err)
+		return err, nil
 	}
 	return err, &movies
 }
@@ -47,7 +47,7 @@ func (ms *movieService) Create(m models.Movie) (error, *models.Movie) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	_, err := ms.db.InsertOne(ctx, &m)
 	if err != nil {
-		panic(err)
+		return err, nil
 	}
 	return err, &m
 }
@@ -56,7 +56,7 @@ func (ms *movieService) GetById(id string) (error, *models.Movie) {
 	var movie models.Movie
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	if err := ms.db.FindOne(ctx, bson.M{}).Decode(&movie); err != nil {
-		log.Fatal(err)
+		return err, nil
 	}
 	return nil, &movie
 }
@@ -65,7 +65,7 @@ func (ms *movieService) UpdateById(id string, m models.Movie) (error, *models.Mo
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	_, err := ms.db.UpdateByID(ctx, id, bson.M{"$set": m})
 	if err != nil {
-		log.Fatal(err)
+		return err, nil
 	}
 	return err, &m
 }
@@ -74,7 +74,7 @@ func (ms *movieService) DeleteById(id string) error {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	_, err := ms.db.DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return err
 }

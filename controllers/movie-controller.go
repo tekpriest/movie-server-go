@@ -1,19 +1,28 @@
+/* Package controllers
+@package controllers
+*/
+
 package controllers
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/en1tan/movie-server/models"
 	"github.com/en1tan/movie-server/services"
+	"github.com/en1tan/movie-server/utils"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
 
+// Package Controllers
+
 type MovieController interface {
 	ListMovies(c *gin.Context)
-	GetMovieById(c *gin.Context)
+	GetMovieByID(c *gin.Context)
 	CreateMovie(c *gin.Context)
-	UpdateMovieById(c *gin.Context)
+	UpdateMovieByID(c *gin.Context)
 	DeleteMovie(c *gin.Context)
 }
 
@@ -27,41 +36,49 @@ func NewMovieController(ms services.MovieService) MovieController {
 
 func (mc *movieController) ListMovies(c *gin.Context) {
 	page := 0
+	pageQuery := c.Query("page")
+	if pageQuery != "" {
+		p, err := strconv.Atoi(pageQuery)
+		if err != nil {
+			c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("invalid page query parameter")))
+			return
+		}
+		page = p
+	}
 	err, movies := mc.ms.List(page)
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(utils.ErrorFromDatabase(err))
+		return
 	}
 	c.JSON(http.StatusOK, movies)
-	return
 }
 
 func (mc *movieController) CreateMovie(c *gin.Context) {
 	var m models.Movie
 	if err := c.ShouldBindJSON(&m); err != nil {
-		c.JSON(400, "An error occured")
+		c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("wrong request body")))
 		return
 	}
 	err, movie := mc.ms.Create(m)
 	if err != nil {
-		panic(err)
+		c.JSON(utils.ErrorFromDatabase(err))
+		return
 	}
 	c.JSON(http.StatusCreated, movie)
-	return
 }
 
-func (mc *movieController) GetMovieById(c *gin.Context) {
+func (mc *movieController) GetMovieByID(c *gin.Context) {
 	err, movie := mc.ms.GetById(c.Param("id"))
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(utils.ErrorFromDatabase(err))
 	}
 	c.JSON(http.StatusOK, movie)
-	return
 }
 
-func (mc *movieController) UpdateMovieById(c *gin.Context) {
+func (mc *movieController) UpdateMovieByID(c *gin.Context) {
 	var m models.Movie
 	if err := c.ShouldBindJSON(&m); err != nil {
-		c.JSON(400, "An Error Occured")
+		c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("wrong request body")))
 		return
 	}
 	err, updatedMovie := mc.ms.UpdateById(c.Param("id"), m)
@@ -74,7 +91,7 @@ func (mc *movieController) UpdateMovieById(c *gin.Context) {
 func (mc *movieController) DeleteMovie(c *gin.Context) {
 	err := mc.ms.DeleteById(c.Param("id"))
 	if err != nil {
-		c.JSON(400, "An Error Occured")
+		c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("an error occured")))
 		return
 	}
 	c.JSON(http.StatusOK, "Movie Deleted")

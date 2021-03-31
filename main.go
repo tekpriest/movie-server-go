@@ -18,6 +18,5 @@ func main() {
 	mc := controllers.NewMovieController(ms)
 
 	r.RegisterMovieRoutes(mc)
-
 	r.Serve()
 }
