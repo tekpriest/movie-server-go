@@ -13,8 +13,8 @@ type Movie struct {
 	Link      string             `bson:"link,omitempty" json:"link"`
 	Type      string             `bson:"type" json:"type"`
 	Year      string             `bson:"year,omitempty" json:"year"`
-	ImdbId    string             `bson:"imdbid,omitempty" json:"imdbid"`
+	ImdbID    string             `bson:"imdbid,omitempty" json:"imdbid"`
 	Genre     string             `bson:"genre" json:"genre"`
-	CreatedAt time.Time          `bson:"createdAt" json:"createdAt" bson:default:now()`
-	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
+	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
+	UpdatedAt time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
 }
