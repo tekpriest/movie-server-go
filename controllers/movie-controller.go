@@ -45,7 +45,7 @@ func (mc *movieController) ListMovies(c *gin.Context) {
 		}
 		page = p
 	}
-	err, movies := mc.ms.List(page)
+	movies, err := mc.ms.List(page)
 	if err != nil {
 		c.JSON(utils.ErrorFromDatabase(err))
 		return
@@ -59,7 +59,7 @@ func (mc *movieController) CreateMovie(c *gin.Context) {
 		c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("wrong request body")))
 		return
 	}
-	err, movie := mc.ms.Create(m)
+	movie, err := mc.ms.Create(m)
 	if err != nil {
 		c.JSON(utils.ErrorFromDatabase(err))
 		return
@@ -68,7 +68,7 @@ func (mc *movieController) CreateMovie(c *gin.Context) {
 }
 
 func (mc *movieController) GetMovieByID(c *gin.Context) {
-	err, movie := mc.ms.GetById(c.Param("id"))
+	movie, err := mc.ms.GetByID(c.Param("id"))
 	if err != nil {
 		c.JSON(utils.ErrorFromDatabase(err))
 	}
@@ -81,7 +81,7 @@ func (mc *movieController) UpdateMovieByID(c *gin.Context) {
 		c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("wrong request body")))
 		return
 	}
-	err, updatedMovie := mc.ms.UpdateById(c.Param("id"), m)
+	updatedMovie, err := mc.ms.UpdateByID(c.Param("id"), m)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,7 +89,7 @@ func (mc *movieController) UpdateMovieByID(c *gin.Context) {
 }
 
 func (mc *movieController) DeleteMovie(c *gin.Context) {
-	err := mc.ms.DeleteById(c.Param("id"))
+	err := mc.ms.DeleteByID(c.Param("id"))
 	if err != nil {
 		c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("an error occured")))
 		return

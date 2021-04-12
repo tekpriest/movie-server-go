@@ -13,11 +13,11 @@ import (
 )
 
 type MovieService interface {
-	List(page int) (error, *[]models.Movie)
-	GetById(id string) (error, *models.Movie)
-	Create(m models.Movie) (error, *models.Movie)
-	UpdateById(id string, m models.Movie) (error, *models.Movie)
-	DeleteById(id string) error
+	List(page int) (*[]models.Movie, error)
+	GetByID(id string) (*models.Movie, error)
+	Create(m models.Movie) (*models.Movie, error)
+	UpdateByID(id string, m models.Movie) (*models.Movie, error)
+	DeleteByID(id string) error
 }
 
 type movieService struct {
@@ -28,69 +28,69 @@ func NewMovieService(conn database.DatabaseConnection) MovieService {
 	return &movieService{db: conn.Get().Collection("movies")}
 }
 
-func (ms *movieService) List(page int) (error, *[]models.Movie) {
+func (ms *movieService) List(page int) (*[]models.Movie, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	var movies []models.Movie
 	opts := options.Find()
-	opts.SetSort(bson.D{{"createdAt", -1}})
+	opts.SetSort(bson.D{{Key: "createdAt", Value: -1}})
 	opts.SetLimit(40)
 	cur, err := ms.db.Find(ctx, bson.D{{}}, opts)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	if err = cur.All(ctx, &movies); err != nil {
-		return err, nil
+		return nil, err
 	}
-	return err, &movies
+	return &movies, err
 }
 
-func (ms *movieService) Create(m models.Movie) (error, *models.Movie) {
+func (ms *movieService) Create(m models.Movie) (*models.Movie, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	m.CreatedAt = time.Now()
 	newMovie, err := ms.db.InsertOne(ctx, &m)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	if err := ms.db.FindOne(ctx, bson.M{"_id": newMovie.InsertedID}).Decode(&m); err != nil {
-		return err, nil
+		return nil, err
 	}
-	return err, &m
+	return &m, err
 }
 
-func (ms *movieService) GetById(id string) (error, *models.Movie) {
+func (ms *movieService) GetByID(id string) (*models.Movie, error) {
 	var movie models.Movie
-	movieId, err := primitive.ObjectIDFromHex(id)
+	movieID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	if err := ms.db.FindOne(ctx, bson.M{"_id": movieId}).Decode(&movie); err != nil {
-		return err, nil
+	if err := ms.db.FindOne(ctx, bson.M{"_id": movieID}).Decode(&movie); err != nil {
+		return nil, err
 	}
-	return nil, &movie
+	return &movie, err
 }
 
-func (ms *movieService) UpdateById(id string, m models.Movie) (error, *models.Movie) {
+func (ms *movieService) UpdateByID(id string, m models.Movie) (*models.Movie, error) {
 	movieID, e := primitive.ObjectIDFromHex(id)
 	if e != nil {
-		return e, nil
+		return nil, e
 	}
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	m.UpdatedAt = time.Now()
 	err := ms.db.FindOneAndReplace(ctx, bson.M{"_id": movieID}, &m).Decode(&m)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
-	return err, &m
+	return &m, err
 }
 
-func (ms *movieService) DeleteById(id string) error {
-	movieId, err := primitive.ObjectIDFromHex(id)
+func (ms *movieService) DeleteByID(id string) error {
+	movieID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	_, deleteErr := ms.db.DeleteOne(ctx, bson.M{"_id": movieId})
+	_, deleteErr := ms.db.DeleteOne(ctx, bson.M{"_id": movieID})
 	if err != nil {
 		return deleteErr
 	}
