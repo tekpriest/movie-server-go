@@ -10,7 +10,7 @@ import (
 type ApiError struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
-}
+} // @Name ResponseError
 
 func CreateApiError(status int, err error) (int, *ApiError) {
 	log.Error(err.Error())

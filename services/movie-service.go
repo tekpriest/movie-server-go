@@ -13,7 +13,7 @@ import (
 )
 
 type MovieService interface {
-	List(page int) (*[]models.Movie, error)
+	List(page, limit int) (*[]models.Movie, int64, error)
 	GetByID(id string) (*models.Movie, error)
 	Create(m models.Movie) (*models.Movie, error)
 	UpdateByID(id string, m models.Movie) (*models.Movie, error)
@@ -28,20 +28,23 @@ func NewMovieService(conn database.DatabaseConnection) MovieService {
 	return &movieService{db: conn.Get().Collection("movies")}
 }
 
-func (ms *movieService) List(page int) (*[]models.Movie, error) {
+func (ms *movieService) List(page, limit int) (*[]models.Movie, int64, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	var movies []models.Movie
+	skip := int64((page - 1) * limit)
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "createdAt", Value: -1}})
-	opts.SetLimit(40)
-	cur, err := ms.db.Find(ctx, bson.D{{}}, opts)
+	opts.SetLimit(int64(limit) * 1)
+	opts.SetSkip(skip)
+	cur, _ := ms.db.Find(ctx, bson.D{{}}, opts)
+	count, err := ms.db.CountDocuments(ctx, bson.D{{}})
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	if err = cur.All(ctx, &movies); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return &movies, err
+	return &movies, count, err
 }
 
 func (ms *movieService) Create(m models.Movie) (*models.Movie, error) {
