@@ -8,16 +8,19 @@ import (
 )
 
 type ApiError struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
+	Status     bool   `json:"status" default:"false"`
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
 } // @Name ResponseError
 
-func CreateApiError(status int, err error) (int, *ApiError) {
+func CreateApiError(statusCode int, err error) (int, *ApiError) {
 	log.Error(err.Error())
+	status := false
 	message := err.Error()
-	return status, &ApiError{
-		Status:  status,
-		Message: message,
+	return statusCode, &ApiError{
+		Status:     status,
+		StatusCode: statusCode,
+		Message:    message,
 	}
 }
 

@@ -36,7 +36,7 @@ func NewMovieController(ms services.MovieService, vu utils.ValidatorUtil) MovieC
 // @Summary Lists all the movies
 // @Param page query string false "page"
 // @Param limit query string false "limit"
-// @Success 200 {array} models.Movie
+// @Success 200 {array} utils.SuccessReponseForArrayOfMovies
 // @Failure 400 {object} utils.ApiError
 // @Router /movies [get]
 // @Tags Movie
@@ -77,7 +77,7 @@ func (mc *movieController) ListMovies(c *gin.Context) {
 // @CreateMovie godoc
 // @Param Movie body models.Movie true "New Movie"
 // @Summary Create New Movie
-// @Success 201 {object} models.Movie
+// @Success 201 {object} utils.SuccesResponseForMovie
 // @Failure 400 {object} utils.ApiError
 // @Failure 500 {object} utils.ApiError
 // @Tags Movie
@@ -105,7 +105,7 @@ func (mc *movieController) CreateMovie(c *gin.Context) {
 // @GetMovieByID godoc
 // @Param id path string true "Movie ID"
 // @Summary Get Movie by ID
-// @Success 200 {object} models.Movie
+// @Success 200 {object} utils.SuccesResponseForMovie
 // @Failure 404 {object} utils.ApiError
 // @Failure 400 {object} utils.ApiError
 // @Failure 500 {object} utils.ApiError
@@ -124,7 +124,7 @@ func (mc *movieController) GetMovieByID(c *gin.Context) {
 // @Param id path string true "Movie ID"
 // @Param Movie body models.Movie true "Movie"
 // @Summary Update Movie Details
-// @Success 200 {object} models.Movie
+// @Success 200 {object} utils.SuccesResponseForMovie
 // @Failure 404 {object} utils.ApiError
 // @Failure 400 {object} utils.ApiError
 // @Failure 500 {object} utils.ApiError

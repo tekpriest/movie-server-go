@@ -6,6 +6,7 @@ Movie Server with [MongoDB]("https://www.mongodb.com/") and [Go]("https://golang
 
 - Clone the repo `git clone https://github.com/en1tan/movie-server-go.git`
 - Download deps `go mod download`
+- Download the swaggo binary [swaggo](https://github.com/swaggo/swag)
 - Generate Swagger UI `swag init`
 - Run Projet `go run ./main.go`
 - Swagger Docs `http://localhost:5013/swagger/index.html`
