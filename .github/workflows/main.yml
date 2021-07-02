@@ -27,6 +27,5 @@ jobs:
     - name: Run vet & lint
       run: |
         go vet .
-        go lint .
         
           
