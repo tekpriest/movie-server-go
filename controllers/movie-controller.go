@@ -32,23 +32,28 @@ func NewMovieController(ms services.MovieService, vu utils.ValidatorUtil) MovieC
 	return &movieController{ms, vu}
 }
 
-// @ListMovies godoc
-// @Summary Lists all the movies
-// @Param page query string false "page"
-// @Param limit query string false "limit"
-// @Success 200 {array} utils.SuccessReponseForArrayOfMovies
-// @Failure 400 {object} utils.ApiError
-// @Router /movies [get]
-// @Tags Movie
-// @ID ListMovies
+/** @ListMovies godoc
+* @Summary Lists all the movies
+* @Param page query string false "page"
+* @Param limit query string false "limit"
+* @Success 200 {object} utils.SuccessReponseForArrayOfMovies
+* @Failure 400 {object} utils.ApiError
+* @Router /movies [get]
+* @Tags Movie
+* @ID ListMovies
+ */
 func (mc *movieController) ListMovies(c *gin.Context) {
 	page, limit := 1, 20
 	pageQuery := c.Query("page")
 	limitQuery := c.Query("limit")
 	if pageQuery != "" || limitQuery != "" {
-		p, err := strconv.Atoi(pageQuery)
-		l, err := strconv.Atoi(limitQuery)
-		if err != nil {
+		p, pageErr := strconv.Atoi(pageQuery)
+		l, limitErr := strconv.Atoi(limitQuery)
+		if pageErr != nil {
+			c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("invalid page query parameter")))
+			return
+		}
+		if limitErr != nil {
 			c.JSON(utils.CreateApiError(http.StatusBadRequest, errors.New("invalid page query parameter")))
 			return
 		}
@@ -63,8 +68,9 @@ func (mc *movieController) ListMovies(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		gin.H{
-			"status":  true,
-			"message": "Fetched All movies",
+			"status":     true,
+			"statusCode": 200,
+			"message":    "Fetched All movies",
 			"data": gin.H{
 				"movies": &movies,
 				"page":   page,

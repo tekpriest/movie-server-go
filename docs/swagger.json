@@ -37,10 +37,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/SuccessReponseForArrayOfMovies"
-                            }
+                            "$ref": "#/definitions/SuccessReponseForArrayOfMovies"
                         }
                     },
                     "400": {
@@ -294,7 +291,7 @@
         "SuccessReponseForArrayOfMovies": {
             "type": "object",
             "properties": {
-                "data": {
+                "data:{movies}": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Movie"

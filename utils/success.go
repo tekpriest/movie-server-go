@@ -15,7 +15,7 @@ type MetaData struct {
 
 type SuccessReponseForArrayOfMovies struct {
 	SuccessResponse
-	Data *[]models.Movie
+	Movies *[]models.Movie
 	MetaData
 } // @Name SuccessReponseForArrayOfMovies
 

@@ -46,7 +46,7 @@ definitions:
     type: object
   SuccessReponseForArrayOfMovies:
     properties:
-      data:
+      data:{movies}:
         items:
           $ref: '#/definitions/Movie'
         type: array
@@ -99,9 +99,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/SuccessReponseForArrayOfMovies'
-            type: array
+            $ref: '#/definitions/SuccessReponseForArrayOfMovies'
         "400":
           description: Bad Request
           schema:
